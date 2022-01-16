@@ -7,6 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iserioton/m416.git"
+  },
   "author": "Keval",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iserioton/m416/issues"
+  },
+  "homepage": "https://github.com/iserioton/m416#readme"
 }

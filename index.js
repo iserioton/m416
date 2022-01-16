@@ -1,6 +1,6 @@
 const https = require('https');
 
-function m416(address = '', method = 'GET', data = {}, headers = {}) {
+async function m416(address = '', method = 'GET', data = {}, headers = {}) {
     let url = new URL(address);
 
     if (!Object.keys(headers).length) {

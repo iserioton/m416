@@ -1,7 +1,9 @@
 const https = require('https');
 
-async function m416(address = '', method = 'GET', data = {}, headers = {}) {
-    let url = new URL(address);
+function m416(address = '', method = 'GET', data = {}, headers = {}) {
+    return new Promise((resolve) => {
+        try{
+        let url = new URL(address);
 
     if (!Object.keys(headers).length) {
         headers = {
@@ -28,27 +30,73 @@ async function m416(address = '', method = 'GET', data = {}, headers = {}) {
         })
         res.on('end', function () {
             tempBuffer = Buffer.concat(tempBuffer).toString();
-            return {
+            resolve({
                 status,
                 data: tempBuffer,
                 message
-            }
+            });
         })
     })
 
     req.on('error', error => {
-        return {
+        resolve({
             status: 512,
             message: error.message,
             data: error.stack
-        }
+        });
     })
 
     if (['POST', 'PUT'].includes(method) && Object.keys(data).length) {
         req.write(JSON.stringify(data))
     }
 
-    req.end();
+    req.end();  
+            
+        }catch(e){
+            resolve(e)
+        }
+    })
+}
+
+async function fetchData(rUrl, query = {}, method = 'GET', headers = {}) {
+    try {
+        let call_parameter = {
+            method,
+            headers: Object.assign({
+                'Content-Type': 'application/json;charset=UTF-8'
+            }, headers)
+        }
+        if (Object.keys(query).length) {
+            if (['POST', 'PUT'].includes(method)) {
+                call_parameter.body = JSON.stringify(query);
+            } else if (['GET', 'DELETE'].includes(method)) {
+                rUrl += `?${objIntoParams(query)}`;
+            }
+        }
+        let responcedData = await fetch(rUrl, call_parameter);
+        if (responcedData?.ok) {
+            responcedData = await responcedData.json();
+        }
+        return responcedData;
+    } catch (e) {
+        console.error('ODD: ', e);
+        return {};
+    }
+}
+
+function objIntoParams(obj, prefix) {
+    var str = [],
+        p;
+    for (p in obj) {
+        if (obj.hasOwnProperty(p)) {
+            var k = prefix ? prefix + "[" + p + "]" : p,
+                v = obj[p];
+            str.push((v !== null && typeof v === "object") ?
+                objIntoParams(v, k) :
+                encodeURIComponent(k) + "=" + encodeURIComponent(v));
+        }
+    }
+    return str.join("&");
 }
 
 module.exports = m416;
